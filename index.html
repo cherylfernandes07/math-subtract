@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Subtraction Game</title>
+		<style>
+			:root {
+				--bg-top: #fff7d6;
+				--bg-bottom: #d4f4ff;
+				--card: #ffffff;
+				--ink: #1f2937;
+				--accent: #f97316;
+				--accent-2: #0ea5e9;
+				--ok: #16a34a;
+				--bad: #dc2626;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				display: grid;
+				place-items: center;
+				padding: 20px;
+				position: relative;
+				overflow: hidden;
+				font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+				color: var(--ink);
+				background: radial-gradient(circle at 20% 20%, #fffef5 0, #fffef5 17%, transparent 18%),
+					radial-gradient(circle at 80% 80%, #e6faff 0, #e6faff 14%, transparent 15%),
+					linear-gradient(145deg, var(--bg-top), var(--bg-bottom));
+			}
+
+			.math-decor {
+				position: fixed;
+				inset: 0;
+				pointer-events: none;
+				z-index: 0;
+			}
+
+			.decor-shape,
+			.decor-number {
+				position: absolute;
+				animation: floaty 7s ease-in-out infinite;
+			}
+
+			.decor-shape {
+				opacity: 0.35;
+			}
+
+			.decor-number {
+				font-size: clamp(1.2rem, 2.5vw, 2rem);
+				font-weight: 800;
+				opacity: 0.28;
+				text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+			}
+
+			.circle {
+				width: 90px;
+				height: 90px;
+				border-radius: 50%;
+				background: #fca5a5;
+			}
+
+			.square {
+				width: 72px;
+				height: 72px;
+				border-radius: 16px;
+				background: #86efac;
+				transform: rotate(18deg);
+			}
+
+			.triangle {
+				width: 0;
+				height: 0;
+				border-left: 42px solid transparent;
+				border-right: 42px solid transparent;
+				border-bottom: 76px solid #93c5fd;
+			}
+
+			.s1 {
+				top: 7%;
+				left: 6%;
+			}
+
+			.s2 {
+				top: 72%;
+				left: 10%;
+				animation-delay: 1.2s;
+			}
+
+			.s3 {
+				top: 12%;
+				right: 8%;
+				animation-delay: 0.8s;
+			}
+
+			.s4 {
+				bottom: 8%;
+				right: 12%;
+				animation-delay: 1.8s;
+			}
+
+			.n1 {
+				top: 18%;
+				left: 24%;
+				color: #0284c7;
+			}
+
+			.n2 {
+				top: 62%;
+				left: 18%;
+				color: #16a34a;
+				animation-delay: 1.4s;
+			}
+
+			.n3 {
+				top: 24%;
+				right: 22%;
+				color: #ea580c;
+				animation-delay: 0.6s;
+			}
+
+			.n4 {
+				bottom: 16%;
+				right: 24%;
+				color: #7c3aed;
+				animation-delay: 2s;
+			}
+
+			@keyframes floaty {
+				0%,
+				100% {
+					transform: translateY(0px) rotate(0deg);
+				}
+				50% {
+					transform: translateY(-10px) rotate(3deg);
+				}
+			}
+
+			.card {
+				width: min(92vw, 560px);
+				background: var(--card);
+				border-radius: 20px;
+				padding: 24px;
+				box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+				position: relative;
+				z-index: 1;
+			}
+
+			h1 {
+				margin: 0 0 8px;
+				text-align: center;
+				font-size: clamp(1.6rem, 3.2vw, 2rem);
+			}
+
+			p {
+				margin: 0;
+				text-align: center;
+			}
+
+			.scoreboard {
+				margin-top: 14px;
+				padding: 10px 12px;
+				border-radius: 12px;
+				text-align: center;
+				font-weight: 700;
+				background: #eff6ff;
+				border: 2px solid #bfdbfe;
+			}
+
+			.problem {
+				display: grid;
+				grid-template-columns: auto auto;
+				align-items: stretch;
+				justify-content: center;
+				gap: 12px;
+				margin-top: 20px;
+			}
+
+			.input-stack {
+				display: grid;
+				gap: 10px;
+				width: auto;
+			}
+
+			.problem label {
+				width: auto;
+			}
+
+			input[type="number"] {
+				width: 140px;
+				font-size: 1.6rem;
+				font-weight: 700;
+				font-family: "Courier New", monospace;
+				letter-spacing: 2px;
+				padding: 12px;
+				padding-right: 16px;
+				border-radius: 12px;
+				border: 2px solid #d1d5db;
+				text-align: right;
+			}
+
+			.minus {
+				font-size: 2.2rem;
+				font-weight: 800;
+				color: var(--accent);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0 4px;
+			}
+
+			button {
+				width: 100%;
+				margin-top: 16px;
+				border: 0;
+				border-radius: 12px;
+				padding: 12px;
+				font-size: 1rem;
+				font-weight: 700;
+				color: #fff;
+				cursor: pointer;
+				background: linear-gradient(90deg, var(--accent), #fb923c);
+			}
+
+			.next-game {
+				display: none;
+				margin-top: 6px;
+				background: linear-gradient(90deg, var(--accent-2), #38bdf8);
+			}
+
+			.choices {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				margin-top: 16px;
+			}
+
+			.choice {
+				background: linear-gradient(120deg, #f0f9ff, #e0f2fe);
+				color: var(--ink);
+				border: 2px solid #bae6fd;
+			}
+
+			.choice.correct {
+				border-color: #86efac;
+				background: #f0fdf4;
+				color: var(--ok);
+			}
+
+			.choice.wrong {
+				border-color: #fecaca;
+				background: #fef2f2;
+				color: var(--bad);
+			}
+
+			.message {
+				margin-top: 12px;
+				text-align: center;
+				min-height: 24px;
+				font-weight: 700;
+			}
+
+			@media (max-width: 520px) {
+				.choices {
+					grid-template-columns: 1fr;
+				}
+
+				.decor-number {
+					opacity: 0.2;
+				}
+
+				.s3,
+				.s4,
+				.n3,
+				.n4 {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="math-decor" aria-hidden="true">
+			<div class="decor-shape circle s1"></div>
+			<div class="decor-shape square s2"></div>
+			<div class="decor-shape triangle s3"></div>
+			<div class="decor-shape circle s4"></div>
+			<span class="decor-number n1">8 - 3</span>
+			<span class="decor-number n2">5 + 2</span>
+			<span class="decor-number n3">9 - 4</span>
+			<span class="decor-number n4">7 + 1</span>
+		</div>
+		<main class="card">
+			<h1>Subtraction for Kids</h1>
+			<p>Two random numbers are ready. Change them if you want, then choose the correct answer.</p>
+			<p id="scoreboard" class="scoreboard" aria-live="polite">Score: 0 / 0</p>
+
+			<section class="problem" aria-label="subtraction problem inputs">
+				<span class="minus" aria-hidden="true">−</span>
+				<div class="input-stack">
+					<label>
+						<span class="sr-only" style="position: absolute; left: -9999px">First number</span>
+						<input id="numA" type="number" min="0" max="999" placeholder="First" />
+					</label>
+					<label>
+						<span class="sr-only" style="position: absolute; left: -9999px">Second number</span>
+						<input id="numB" type="number" min="0" max="999" placeholder="Second" />
+					</label>
+				</div>
+			</section>
+
+			<button id="showChoicesBtn" type="button">Show 2 Answers</button>
+			<section id="choices" class="choices" aria-live="polite"></section>
+			<p id="message" class="message" aria-live="polite"></p>
+			<button id="nextGameBtn" class="next-game" type="button">Start Another Game</button>
+		</main>
+
+		<script>
+			const numA = document.getElementById("numA");
+			const numB = document.getElementById("numB");
+			const showChoicesBtn = document.getElementById("showChoicesBtn");
+			const choices = document.getElementById("choices");
+			const message = document.getElementById("message");
+			const scoreboard = document.getElementById("scoreboard");
+			const nextGameBtn = document.getElementById("nextGameBtn");
+
+			let correctCount = 0;
+			let attemptCount = 0;
+
+			function clampToThreeDigits(input) {
+				if (input.value === "") {
+					return;
+				}
+
+				let value = Math.floor(Number(input.value));
+				if (Number.isNaN(value)) {
+					input.value = "";
+					return;
+				}
+
+				value = Math.max(0, Math.min(999, value));
+				input.value = String(value);
+			}
+
+			function getOptionPair(correctAnswer) {
+				const offset = Math.floor(Math.random() * 9) + 1;
+				const usePlus = Math.random() > 0.5;
+				let wrongAnswer = usePlus ? correctAnswer + offset : correctAnswer - offset;
+
+				if (wrongAnswer < 0 || wrongAnswer === correctAnswer) {
+					wrongAnswer = correctAnswer + offset;
+				}
+
+				return Math.random() > 0.5
+					? [correctAnswer, wrongAnswer]
+					: [wrongAnswer, correctAnswer];
+			}
+
+			function clearChoices() {
+				choices.innerHTML = "";
+			}
+
+			function setRandomNumbers() {
+				const first = Math.floor(Math.random() * 1000);
+				const second = Math.floor(Math.random() * (first + 1));
+				numA.value = String(first);
+				numB.value = String(second);
+			}
+
+			function updateScoreboard() {
+				scoreboard.textContent = `Score: ${correctCount} / ${attemptCount}`;
+			}
+
+			[numA, numB].forEach((input) => {
+				input.addEventListener("input", () => clampToThreeDigits(input));
+			});
+
+			setRandomNumbers();
+
+			showChoicesBtn.addEventListener("click", () => {
+				message.textContent = "";
+				clearChoices();
+				nextGameBtn.style.display = "none";
+
+				if (numA.value === "" || numB.value === "") {
+					message.textContent = "Please enter both numbers.";
+					return;
+				}
+
+				const a = Number(numA.value);
+				const b = Number(numB.value);
+
+				if (a < b) {
+					message.textContent = "Use a first number that is bigger than or equal to the second.";
+					return;
+				}
+
+				const correctAnswer = a - b;
+				const answerOptions = getOptionPair(correctAnswer);
+
+				answerOptions.forEach((option) => {
+					const btn = document.createElement("button");
+					btn.type = "button";
+					btn.className = "choice";
+					btn.textContent = String(option);
+
+					btn.addEventListener("click", () => {
+						const allChoiceButtons = choices.querySelectorAll("button");
+						allChoiceButtons.forEach((choiceBtn) => {
+							choiceBtn.disabled = true;
+							choiceBtn.classList.remove("correct", "wrong");
+
+							if (Number(choiceBtn.textContent) === correctAnswer) {
+								choiceBtn.classList.add("correct");
+							}
+						});
+
+						if (option === correctAnswer) {
+							correctCount += 1;
+							attemptCount += 1;
+							updateScoreboard();
+							message.textContent = "🐰 Great job! That is correct.";
+							nextGameBtn.style.display = "block";
+						} else {
+							btn.classList.add("wrong");
+							attemptCount += 1;
+							updateScoreboard();
+						message.textContent = "🐶 Nice try! The highlighted green answer is correct.";
+							nextGameBtn.style.display = "block";
+						}
+					});
+
+					choices.appendChild(btn);
+				});
+			});
+
+			nextGameBtn.addEventListener("click", () => {
+				setRandomNumbers();
+				clearChoices();
+				message.textContent = "";
+				nextGameBtn.style.display = "none";
+			});
+		</script>
+	</body>
+</html>

@@ -250,6 +250,14 @@
 				margin-top: 16px;
 			}
 
+			.choices-prompt {
+				display: none;
+				margin-top: 12px;
+				text-align: center;
+				font-weight: 700;
+				color: #0f766e;
+			}
+
 			.choice {
 				background: linear-gradient(120deg, #f0f9ff, #e0f2fe);
 				color: var(--ink);
@@ -324,6 +332,7 @@
 			</section>
 
 			<button id="showChoicesBtn" type="button">Show 2 Answers</button>
+			<p id="choicesPrompt" class="choices-prompt" aria-live="polite">Select one answer</p>
 			<section id="choices" class="choices" aria-live="polite"></section>
 			<p id="message" class="message" aria-live="polite"></p>
 			<button id="nextGameBtn" class="next-game" type="button">Start Another Game</button>
@@ -337,6 +346,7 @@
 			const message = document.getElementById("message");
 			const scoreboard = document.getElementById("scoreboard");
 			const nextGameBtn = document.getElementById("nextGameBtn");
+			const choicesPrompt = document.getElementById("choicesPrompt");
 
 			let correctCount = 0;
 			let attemptCount = 0;
@@ -372,6 +382,7 @@
 
 			function clearChoices() {
 				choices.innerHTML = "";
+				choicesPrompt.style.display = "none";
 			}
 
 			function setRandomNumbers() {
@@ -411,6 +422,7 @@
 
 				const correctAnswer = a - b;
 				const answerOptions = getOptionPair(correctAnswer);
+				choicesPrompt.style.display = "block";
 
 				answerOptions.forEach((option) => {
 					const btn = document.createElement("button");
